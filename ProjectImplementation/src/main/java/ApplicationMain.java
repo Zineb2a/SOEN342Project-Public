@@ -23,22 +23,22 @@ public class ApplicationMain {
             Organization organization = new Organization();
             organization.setName("Fitness Academy");
 
-            //  Create Administrator
+            // Create Administrator
             Administrator admin = new Administrator(null, "Admin John");
             admin.setOrganization(organization);
             admin.setPassword("double007");
             em.persist(admin);
-//
-//            // 2. Create Locations and Rooms within Organization
+
+            // 2. Create Locations and Rooms within Organization
             Location location1 = new Location();
             location1.setName("Downtown Gym");
             location1.setCity("San Francisco");
             location1.setOrganization(organization);
-//
+
             Room room1 = new Room();
             room1.setName("Room A");
             room1.setLocation(location1);
-//
+
             Room room2 = new Room();
             room2.setName("Room B");
             room2.setLocation(location1);
@@ -50,74 +50,85 @@ public class ApplicationMain {
             // Persist Organization and its structure
             em.persist(organization);
 
-            // 3. Create Schedule and Timeslots
-            Schedule schedule = new Schedule();
-            TimeSlot timeslot1 = new TimeSlot(LocalDateTime.of(2024, Month.JANUARY, 5, 10, 0));
-            TimeSlot timeslot2 = new TimeSlot(LocalDateTime.of(2024, Month.JANUARY, 5, 14, 0));
-            schedule.addTimeSlot(timeslot1);
-            schedule.addTimeSlot(timeslot2);
-            schedule.setStartTime(Instant.now());
-            schedule.setEndTime(Instant.now());
-            schedule.setRoom(room1);
-//
+            // 3. Create Schedule and Add TimeSlots with Validation
+
+            Schedule schedule = new Schedule(
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 9, 0),
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 17, 0),
+                    room1
+            );
+
             em.persist(schedule);
+
+            // Adding first TimeSlot (should succeed)
+            TimeSlot timeslot1 = new TimeSlot(
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 10, 0),
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 11, 0),
+                    schedule
+            );
+            if (schedule.addTimeSlotWithValidation(timeslot1)) {
+                em.persist(timeslot1);
+            }
+
+            // Attempt to add overlapping TimeSlot (should print error)
+            TimeSlot timeslot2 = new TimeSlot(
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 10, 30),
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 11, 30),
+                    schedule
+            );
+            if (schedule.addTimeSlotWithValidation(timeslot2)) {
+                em.persist(timeslot2);
+            }
+
+            // Adding a non-overlapping TimeSlot (should succeed)
+            TimeSlot timeslot3 = new TimeSlot(
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 11, 30),
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 12, 30),
+                    schedule
+            );
+            if (schedule.addTimeSlotWithValidation(timeslot3)) {
+                em.persist(timeslot3);
+            }
 
             // 4. Create Lessons and Offerings
             Lesson yogaLesson = new Lesson();
             yogaLesson.setName("Yoga Class");
             yogaLesson.setType("Private");
-
-
-            admin.createLesson("Taekwando","Group",false);
-
+            em.persist(yogaLesson);
 
             Lesson pilatesLesson = new Lesson();
             pilatesLesson.setName("Pilates Class");
             pilatesLesson.setType("Group");
-
-            em.persist(yogaLesson);
             em.persist(pilatesLesson);
 
-            // 5. Create Instructors
-            Instructor instructor1 = new Instructor(null, "Instructor 1","Yoga");
+            // 5. Create Instructor and Offering
+            Instructor instructor1 = new Instructor(null, "Instructor 1", "Yoga");
             instructor1.setPassword("double008");
             em.persist(instructor1);
 
-            Offering offered = instructor1.createOffering(yogaLesson,room1,schedule,LocalDateTime.of(2024, Month.JANUARY, 5, 10, 0),10);
-
-
+            Offering offered = instructor1.createOffering(yogaLesson, room1, schedule,
+                    LocalDateTime.of(2024, Month.JANUARY, 5, 10, 0), 10);
             offered.setMaxCapacity(1);
-            System.out.println();
             em.persist(offered);
-
-
 
             // 6. Create Clients and LegalGuardian (for minor clients)
             LegalGuardian guardian = new LegalGuardian(null, "Jane Doe");
-//
             guardian.setPassword("double009");
-            Client client1 = new Client(null, "Alice Johnson");
-            Client client2 = new Client(null, "Tommy Doe");
-
-            client1.setPassword("double008");
-            client2.setPassword("double009");
-
-            client2.setGuardian(guardian);
-
             em.persist(guardian);
+
+            Client client1 = new Client(null, "Alice Johnson");
+            client1.setPassword("double008");
             em.persist(client1);
+
+            Client client2 = new Client(null, "Tommy Doe");
+            client2.setPassword("double009");
+            client2.setGuardian(guardian);
             em.persist(client2);
-//
-//
-            // 8. Create Bookings
+
+            // 7. Create Bookings
             Booking booking1 = new Booking(client1, offered, Instant.now());
             booking1.setIsAvailable(true);
-
-
-
             em.persist(booking1);
-
-            System.out.println( offered.getBookings()+"iefjeifjef"+offered.getCurrentCapacity()+"YEYEYEYEYEYEYEYEYEYEEEEEYEYYE"+offered.isAvailable());
 
             // Commit the transaction
             em.getTransaction().commit();
@@ -153,7 +164,8 @@ public class ApplicationMain {
         for (Offering offering : offerings) {
             System.out.println("Offering: " + offering.getLesson().getName() + " on " + offering.getDateTime());
             for (Booking booking : offering.getBookings()) {
-                System.out.println("  - Client: " + booking.getClient().getName() + " (Booking Available: " + booking.getIsAvailable() + ")");
+                System.out.println("  - Client: " + booking.getClient().getName() +
+                        " (Booking Available: " + booking.getIsAvailable() + ")");
             }
         }
     }

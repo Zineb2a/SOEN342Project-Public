@@ -1,7 +1,7 @@
 package entity;
 
 import jakarta.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +14,10 @@ public class Schedule {
     private Long id;
 
     @Column(name = "start_time", nullable = false)
-    private Instant startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "end_time", nullable = false)
-    private Instant endTime;
+    private LocalDateTime endTime;
 
     // Many-to-one relationship with Room
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,10 +36,30 @@ public class Schedule {
     // Constructors
     public Schedule() {}
 
-    public Schedule(Instant startTime, Instant endTime, Room room) {
+    public Schedule(LocalDateTime startTime, LocalDateTime endTime, Room room) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.room = room;
+    }
+
+    // Method to add a time slot with overlap validation
+    public boolean addTimeSlotWithValidation(TimeSlot newTimeSlot) {
+        if (isTimeSlotOverlapping(newTimeSlot)) {
+            System.out.println("Error: The new time slot overlaps with an existing one.");
+            return false;
+        } else {
+            addTimeSlot(newTimeSlot);
+            return true;
+        }
+    }
+
+    private boolean isTimeSlotOverlapping(TimeSlot newTimeSlot) {
+        for (TimeSlot existingTimeSlot : timeSlots) {
+            if (existingTimeSlot.overlapsWith(newTimeSlot)) {
+                return true; // Conflict found
+            }
+        }
+        return false; // No conflicts
     }
 
     public void addTimeSlot(TimeSlot timeSlot) {
@@ -56,19 +76,19 @@ public class Schedule {
         this.id = id;
     }
 
-    public Instant getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Instant startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public Instant getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Instant endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 

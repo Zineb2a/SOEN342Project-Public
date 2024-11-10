@@ -1,7 +1,6 @@
 package entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,24 +21,26 @@ public class TimeSlot {
     @JoinColumn(name = "offering_id")
     private Offering offering;
 
-
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    // Constructors
+    @Column(name = "end_time", nullable = false)
+    private LocalDateTime endTime;
+
+    // Default constructor
     public TimeSlot() {}
 
-    public TimeSlot(LocalDateTime startTime) {
+    // Constructor with LocalDateTime parameters
+    public TimeSlot(LocalDateTime startTime, LocalDateTime endTime, Schedule schedule, Offering offering) {
         this.startTime = startTime;
-    }
-    public LocalDateTime getStartTime() {
-        return startTime;
+        this.endTime = endTime;
+        this.schedule = schedule;
+        this.offering = offering;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public TimeSlot(LocalDateTime startTime, LocalDateTime endTime, Schedule schedule) {
         this.startTime = startTime;
-    }
-    public TimeSlot(Schedule schedule) {
+        this.endTime = endTime;
         this.schedule = schedule;
     }
 
@@ -50,6 +51,22 @@ public class TimeSlot {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public Schedule getSchedule() {
@@ -66,5 +83,10 @@ public class TimeSlot {
 
     public void setOffering(Offering offering) {
         this.offering = offering;
+    }
+
+    // Method to check for overlap
+    public boolean overlapsWith(TimeSlot other) {
+        return this.startTime.isBefore(other.endTime) && this.endTime.isAfter(other.startTime);
     }
 }
