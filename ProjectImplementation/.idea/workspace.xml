@@ -5,27 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46a47d71-fe49-462f-b0bf-45e4d97476e7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/SOEN342Project.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jpa.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ApplicationMain.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Administrator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Booking.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Client.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Instructor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/LegalGuardian.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Lesson.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Location.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Offering.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Organization.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Person.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Room.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/Schedule.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/entity/TimeSlot.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ApplicationMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ApplicationMain.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

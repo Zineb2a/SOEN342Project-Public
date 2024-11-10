@@ -1,38 +1,40 @@
 import entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.Persistence;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
+import java.util.Scanner;
 
 public class ApplicationMain {
+
+    private static EntityManager em;
+    private static Person loggedInUser;
 
     public static void main(String[] args) {
         // Set up EntityManager and EntityManagerFactory
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("lesson_management");
-        EntityManager em = emf.createEntityManager();
+         em = emf.createEntityManager();
 
         try {
-            // Start a transaction
+
             em.getTransaction().begin();
 
-            // 1. Create Organization
             Organization organization = new Organization();
             organization.setName("Fitness Academy");
 
-            // Create Administrator
             Administrator admin = new Administrator(null, "Admin John");
             admin.setOrganization(organization);
             admin.setPassword("double007");
             em.persist(admin);
 
-            // 2. Create Locations and Rooms within Organization
             Location location1 = new Location();
             location1.setName("Downtown Gym");
-            location1.setCity("San Francisco");
+            location1.setCity("Montreal");
             location1.setOrganization(organization);
 
             Room room1 = new Room();
@@ -47,10 +49,7 @@ public class ApplicationMain {
             location1.addRoom(room1);
             location1.addRoom(room2);
 
-            // Persist Organization and its structure
             em.persist(organization);
-
-            // 3. Create Schedule and Add TimeSlots with Validation
 
             Schedule schedule = new Schedule(
                     LocalDateTime.of(2024, Month.JANUARY, 5, 9, 0),
@@ -60,7 +59,6 @@ public class ApplicationMain {
 
             em.persist(schedule);
 
-            // Adding first TimeSlot (should succeed)
             TimeSlot timeslot1 = new TimeSlot(
                     LocalDateTime.of(2024, Month.JANUARY, 5, 10, 0),
                     LocalDateTime.of(2024, Month.JANUARY, 5, 11, 0),
@@ -90,7 +88,6 @@ public class ApplicationMain {
                 em.persist(timeslot3);
             }
 
-            // 4. Create Lessons and Offerings
             Lesson yogaLesson = new Lesson();
             yogaLesson.setName("Yoga Class");
             yogaLesson.setType("Private");
@@ -101,7 +98,6 @@ public class ApplicationMain {
             pilatesLesson.setType("Group");
             em.persist(pilatesLesson);
 
-            // 5. Create Instructor and Offering
             Instructor instructor1 = new Instructor(null, "Instructor 1", "Yoga");
             instructor1.setPassword("double008");
             em.persist(instructor1);
@@ -111,7 +107,6 @@ public class ApplicationMain {
             offered.setMaxCapacity(1);
             em.persist(offered);
 
-            // 6. Create Clients and LegalGuardian (for minor clients)
             LegalGuardian guardian = new LegalGuardian(null, "Jane Doe");
             guardian.setPassword("double009");
             em.persist(guardian);
@@ -125,24 +120,96 @@ public class ApplicationMain {
             client2.setGuardian(guardian);
             em.persist(client2);
 
-            // 7. Create Bookings
             Booking booking1 = new Booking(client1, offered, Instant.now());
             booking1.setIsAvailable(true);
             em.persist(booking1);
 
-            // Commit the transaction
             em.getTransaction().commit();
 
-            // Display information
             displayOrganizationStructure(em);
-            displayOfferingsAndClients(em);
+            displayOfferings(em);
 
         } finally {
-            // Close EntityManager and EntityManagerFactory
             em.close();
             emf.close();
         }
     }
+
+    // Registration Functionality
+    private static void registerUser(Scanner scanner) {
+        System.out.println("Select user type for registration: 1. Client 2. Instructor");
+        int userType = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        System.out.println("Enter name:");
+        String name = scanner.next();
+        System.out.println("Enter password:");
+        String password = scanner.next();
+
+        em.getTransaction().begin();
+        try {
+            if (userType == 1) {
+
+                Client client = new Client(null, name);
+                client.setPassword(password);
+                em.persist(client);
+                System.out.println("Client registered successfully.");
+            } else if (userType == 2) {
+
+                System.out.print("Enter specialization (e.g., Yoga, Swimming): ");
+                String specialization = scanner.nextLine();
+                Instructor instructor = new Instructor(null, name, specialization);
+                instructor.setPassword(password);
+                em.persist(instructor);
+                System.out.println("Instructor registered successfully.");
+            } else {
+                System.out.println("Invalid user type selection.");
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            e.printStackTrace();
+            System.out.println("Registration failed. Please try again.");
+        }
+    }
+
+    // Login Functionality
+    private static void loginUser(Scanner scanner) {
+        if (loggedInUser != null) {
+            System.out.println("Already logged in as " + loggedInUser.getName());
+            return;
+        }
+
+        System.out.println("Enter name:");
+        String name = scanner.next();
+        System.out.println("Enter password:");
+        String password = scanner.next();
+
+        try {
+            Person user = em.createQuery(
+                            "SELECT p FROM Person p WHERE p.name = :name AND p.password = :password", Person.class)
+                    .setParameter("name", name)
+                    .setParameter("password", password)
+                    .getSingleResult();
+
+            loggedInUser = user;
+            System.out.println("Login successful. Welcome, " + loggedInUser.getName() + "!");
+        } catch (NoResultException e) {
+            System.out.println("Invalid name or password. Please try again.");
+        }
+    }
+
+    // Logout Functionality
+    private static void logoutUser() {
+        if (loggedInUser == null) {
+            System.out.println("No user is currently logged in.");
+        } else {
+            System.out.println("Logging out " + loggedInUser.getName() + "...");
+            loggedInUser = null;
+            System.out.println("Logout successful.");
+        }
+    }
+
 
     // Display organization structure
     private static void displayOrganizationStructure(EntityManager em) {
@@ -159,14 +226,11 @@ public class ApplicationMain {
     }
 
     // Display offerings and clients
-    private static void displayOfferingsAndClients(EntityManager em) {
+    private static void displayOfferings(EntityManager em) {
         List<Offering> offerings = em.createQuery("SELECT o FROM Offering o", Offering.class).getResultList();
         for (Offering offering : offerings) {
-            System.out.println("Offering: " + offering.getLesson().getName() + " on " + offering.getDateTime());
-            for (Booking booking : offering.getBookings()) {
-                System.out.println("  - Client: " + booking.getClient().getName() +
-                        " (Booking Available: " + booking.getIsAvailable() + ")");
-            }
+            System.out.println("Offering: " + offering.getLesson().getName() + " on " + offering.getDateTime() + " " + offering.getDescription() + " "+ offering.isAvailable());
+
         }
     }
 }
