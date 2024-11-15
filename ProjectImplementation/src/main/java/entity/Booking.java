@@ -27,7 +27,6 @@ public class Booking {
     @Column(name = "is_available", nullable = false)
     private Boolean isAvailable = false;
 
-    // Constructors
     public Booking() {}
 
     public Booking(Client client, Offering offering, Instant bookingDate) {
