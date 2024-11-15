@@ -27,7 +27,6 @@ public class Location {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Room> rooms = new HashSet<>();
 
-    // Constructors
     public Location() {}
 
     public Location(String name, String city, Organization organization) {

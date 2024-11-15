@@ -33,7 +33,6 @@ public class Schedule {
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
-    // Constructors
     public Schedule() {}
 
     public Schedule(LocalDateTime startTime, LocalDateTime endTime, Room room) {

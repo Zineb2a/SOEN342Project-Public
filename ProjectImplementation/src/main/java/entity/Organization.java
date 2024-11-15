@@ -19,7 +19,6 @@ public class Organization {
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Location> locations = new HashSet<>();
 
-    // Constructors
     public Organization() {}
 
     public Organization(String name) {

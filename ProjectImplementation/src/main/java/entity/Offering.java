@@ -51,7 +51,6 @@ public class Offering {
     @Transient
     private boolean isAvailable;
 
-    // Constructors
     public Offering() {}
 
     public Offering(Long id) {
@@ -154,14 +153,16 @@ public class Offering {
         return clients;
     }
 
-    // Get the current capacity based on bookings list
     public int getCurrentCapacity() {
         return currentCapacity;
     }
 
-    // Check if offering is available
     public boolean isAvailable() {
-        return currentCapacity < maxCapacity;
+        if(currentCapacity < maxCapacity){
+            isAvailable = true;
+        }else
+            isAvailable = false;
+        return isAvailable;
     }
 
     // Private helper method to update current capacity and availability

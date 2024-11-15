@@ -24,7 +24,6 @@ public class Room {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Schedule> schedules = new HashSet<>();
 
-    // Constructors
     public Room() {}
 
     public Room(String name, Location location) {
@@ -32,7 +31,6 @@ public class Room {
         this.location = location;
     }
 
-    // Method to add a schedule to the room
     public void addSchedule(Schedule schedule) {
         schedules.add(schedule);
         schedule.setRoom(this);

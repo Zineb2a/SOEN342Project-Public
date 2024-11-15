@@ -9,23 +9,33 @@ public class Client extends Person {
 
     @ManyToOne
     private Administrator administrator;
-    // One-to-many relationship with Booking
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
 
-    // Many-to-one relationship with LegalGuardian (optional)
     @ManyToOne
     @JoinColumn(name = "guardian_id")
     private LegalGuardian guardian;
 
-    // Constructors
+    @Column(name = "age", nullable = false)
+    private int age;
+
     public Client() {}
 
-    public Client(Long id, String name) {
+    public Client(Long id, String name, int age) {
         super(id, name);
+        this.age = age;
     }
 
     // Getters and Setters
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
     public List<Booking> getBookings() {
         return bookings;
     }
@@ -52,5 +62,4 @@ public class Client extends Person {
         bookings.remove(booking);
         booking.setClient(null);
     }
-
 }
